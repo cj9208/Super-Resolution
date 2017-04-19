@@ -1,42 +1,31 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 '''
-isize : image size，  
-nz : number of latent variables
-nc : number of channel
-ngf : number of hidden units of generator
-
-the size of input image : nz 
-the size of output image : nc * isize * isize 
-
-In this experiment : 
-ngf = 64
-nz = 14 * 14
-nc = 1
-isize = 28
+The generator network : 
+    1. Use pixel_shuffle to scale the image by 2X 
+    2. Since all layers are convolutional layers, 
+    so there is no requirement on the height and width to the images and
+    the only requirement is the channel of the images is 1
 '''
-class MLP_G(nn.Module):
-    def __init__(self, isize, nz, nc, ngf):
-        super(MLP_G, self).__init__()
 
-        main = nn.Sequential(
-            # Z goes into a linear of size: ngf
-            nn.Linear(nz, ngf),
-            nn.ReLU(True),
-            nn.Linear(ngf, ngf),
-            nn.ReLU(True),
-            nn.Linear(ngf, ngf),
-            nn.ReLU(True),
-            nn.Linear(ngf, nc * isize * isize),
+class Adversarial_G(nn.Module):
+    def __init__(self):
+        super(Adversarial_G, self).__init__()
+
+        self.main = nn.Sequential(
+            nn.Conv2d(1,32,3,padding = 1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            
+            nn.Conv2d(32,32,3,padding = 1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            
+            nn.Conv2d(32,4,3,padding = 1),
+            nn.Sigmoid(),        
         )
-        self.main = main
-        self.nc = nc
-        self.isize = isize
-        self.nz = nz
-
-    def forward(self, input):
-        input = input.view(input.size(0), -1)
-        output = self.main(input)
-        return output.view(output.size(0), self.nc, self.isize, self.isize)
+        
+    def forward(self, inputs):
+        outputs = self.main(inputs)
+        return nn.functional.pixel_shuffle(outputs, upscale_factor = 2)

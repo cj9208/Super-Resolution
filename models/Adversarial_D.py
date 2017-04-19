@@ -1,35 +1,32 @@
 import torch
 import torch.nn as nn
-'''
-The discriminator network outputs a probability for each input
 
-In this experiment : 
-isize : 28
-nc : 1
-ndf : 64
+'''
+The discriminator network:
+    1. Use LeakyReLU activation
+    2. The size of input should be divided by 4
 '''
 
-class MLP_D(nn.Module):
-    def __init__(self, isize, nc, ndf):
-        super(MLP_D, self).__init__()
 
-        main = nn.Sequential(
-            # Z goes into a linear of size: ndf
-            nn.Linear(nc * isize * isize, ndf),
-            nn.ReLU(True),
-            nn.Linear(ndf, ndf),
-            nn.ReLU(True),
-            nn.Linear(ndf, ndf),
-            nn.ReLU(True),
-            nn.Linear(ndf, 1),
-            nn.Sigmoid() # make the outputs to be in [0,1], so that it represents a probability
+class Adversarial_D(nn.Module):
+    def __init__(self, input_size):
+        super(Adversarial_D, self).__init__()
+        
+        kernel_size = int(input_size / 4) #otherwise it would give float  
+        
+        self.main = nn.Sequential(
+            nn.Conv2d(1,64,3,stride = 2, padding=1),
+            nn.LeakyReLU(negative_slope=0.2),
+            
+            nn.Conv2d(64,64,3,stride = 2, padding=1),
+            nn.LeakyReLU(negative_slope=0.2),
+            
+            nn.Conv2d(64,1,kernel_size),
+            nn.Sigmoid(),
         )
-        self.main = main
-        self.nc = nc
-        self.isize = isize
 
-    def forward(self, input):
-        input = input.view(input.size(0),-1)
-        output = self.main(input)
 
-        return output
+    def forward(self, inputs):
+        outputs = self.main(inputs)
+        return outputs.view(-1)
+    

@@ -1,2 +1,5 @@
-from .Adversarial_D import MLP_D
-from .Adversarial_G import MLP_G
+from .MLP_D import MLP_D
+from .MLP_G import MLP_G
+
+from .Adversarial_D import Adversarial_D
+from .Adversarial_G import Adversarial_G
