@@ -25,7 +25,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default = 'mnist', help='mnist | cifar10')
 parser.add_argument('--batch_size', type=int, default=32, help='input batch size')
 
-parser.add_argument('--niter', type=int, default=1, help='number of epochs to train for')
+parser.add_argument('--niter', type=int, default=10, help='number of epochs to train for')
 parser.add_argument('--lrG', type=float, default=0.01, help='learning rate of generator, default=0.01')
 parser.add_argument('--lrD', type=float, default=0.01, help='learning rate of discriminator, default=0.01')
 parser.add_argument('--ratio', type=float, default=1e-2, help = 'ratio of GAN loss')
@@ -353,9 +353,9 @@ if opt.mode == 'visual':
             inputs, targets = Variable(inputs), Variable(targets)
             G_outputs = G(inputs)
             
-            imshow(torchvision.utils.make_grid(inputs.data))
-            imshow(torchvision.utils.make_grid(G_outputs.data))
-            imshow(torchvision.utils.make_grid(targets.data))
+            torchvision.utils.save_image(inputs.data, 'inputs_samples_{}_{}_{}_{}_{}.png'.format(opt.mode, opt.niter, opt.lrD, opt.lrG, opt.ratio))
+            torchvision.utils.save_image(G_outputs.data, 'outputs_samples_{}_{}_{}_{}_{}.png'.format(opt.mode, opt.niter, opt.lrD, opt.lrG, opt.ratio))
+            torchvision.utils.save_image(targets.data, 'origin_samples_{}_{}_{}_{}_{}.png'.format(opt.mode, opt.niter,opt.lrD, opt.lrG, opt.ratio))
 
 
         
