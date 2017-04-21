@@ -215,9 +215,9 @@ if opt.mode == 'MSE':
             inputs, targets = Variable(inputs), Variable(targets)
             G_outputs = G(inputs)
             
-            torchvision.utils.save_image(inputs.data, 'inputs_samples_{}_{}.png'.format(opt.mode, opt.niter))
-            torchvision.utils.save_image(G_outputs.data, 'outputs_samples_{}_{}.png'.format(opt.mode,opt.niter))
-            torchvision.utils.save_image(targets.data, 'origin_samples_{}_{}.png'.format(opt.mode,opt.niter))
+            torchvision.utils.save_image(inputs.data, 'inputs_samples_{}_{}_{}_{}_{}.png'.format(opt.mode, opt.niter, opt.lrD, opt.lrG, opt.ratio))
+            torchvision.utils.save_image(G_outputs.data, 'outputs_samples_{}_{}_{}_{}_{}.png'.format(opt.mode, opt.niter, opt.lrD, opt.lrG, opt.ratio))
+            torchvision.utils.save_image(targets.data, 'origin_samples_{}_{}_{}_{}_{}.png'.format(opt.mode, opt.niter,opt.lrD, opt.lrG, opt.ratio))
 
 if opt.mode == 'GAN':
     print('I love GAN\n')
@@ -322,15 +322,28 @@ if opt.mode == 'GAN':
 
             optimizerG.step()
             
-            torch.save({'epoch': epoch + 1,
-                        'state_dict': G.state_dict(),
-                        'best_prec1': 0,
-                       }, 'checkpoint/G_GAN.pth.tar' )
-            torch.save({'epoch': epoch + 1,
-                        'state_dict': D.state_dict(),
-                        'best_prec1': 0,
-                       }, 'checkpoint/D_GAN.pth.tar' )
+    torch.save({'epoch': epoch + 1,
+                'state_dict': G.state_dict(),
+                'best_prec1': 0,
+               }, 'checkpoint/G_GAN.pth.tar' )
+    torch.save({'epoch': epoch + 1,
+                'state_dict': D.state_dict(),
+                'best_prec1': 0,
+               }, 'checkpoint/D_GAN.pth.tar' )
+    
+    print('Save the ouputs : ')
+    G.eval()
+    for batch_index, (inputs, targets) in enumerate(loader):
+        if batch_index == 0:
+            if use_cuda:
+                inputs, targets = inputs.cuda(), targets.cuda()
+            inputs, targets = Variable(inputs), Variable(targets)
+            G_outputs = G(inputs)
             
+            torchvision.utils.save_image(inputs.data, 'inputs_samples_{}_{}_{}_{}_{}.png'.format(opt.mode, opt.niter, opt.lrD, opt.lrG, opt.ratio))
+            torchvision.utils.save_image(G_outputs.data, 'outputs_samples_{}_{}_{}_{}_{}.png'.format(opt.mode, opt.niter, opt.lrD, opt.lrG, opt.ratio))
+            torchvision.utils.save_image(targets.data, 'origin_samples_{}_{}_{}_{}_{}.png'.format(opt.mode, opt.niter,opt.lrD, opt.lrG, opt.ratio))
+       
 if opt.mode == 'visual':
     G = Adversarial_G()
     if opt.resume:
