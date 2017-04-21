@@ -20,6 +20,7 @@ from models import *
 # for dataset
 # given a batch of images, can I scale them all ? 
 import mymnist
+import mycifar
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default = 'mnist', help='mnist | cifar10')
@@ -150,7 +151,21 @@ if opt.dataset == 'mnist':
                                        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                                    ]))
     validate_loader = torch.utils.data.DataLoader(validate_mnist,batch_size=opt.batch_size, shuffle=True)  
-    print('==> Dataset and Dataloader have been set !')
+    print('==> MNIST have been set !')
+elif opt.dataset = 'cifar':
+    cifar = mycifar.CIFAR10('data', train=True, download=True,
+                           transform=transforms.Compose([
+                               transforms.ToTensor(),
+                               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+                           ]))
+    loader = torch.utils.data.DataLoader(cifar,batch_size=opt.batch_size, shuffle=True)
+    validate_cifar = mycifar.CIFAR10('data', train=True, download=True,
+                                     transform=transforms.Compose([
+                                         transforms.ToTensor(),
+                                         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+                                     ]))
+    validate_loader = torch.utils.data.DataLoader(validate_cifar,batch_size=opt.batch_size, shuffle=True)
+    print('==> CIFAR have been set')
     
      
     
