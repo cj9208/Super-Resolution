@@ -22,8 +22,7 @@ class Adversarial_G(nn.Module):
             nn.BatchNorm2d(32),
             nn.ReLU(),
             
-            nn.Conv2d(32,4,3,padding = 1),
-            nn.Sigmoid(),        
+            nn.Conv2d(32,4,3,padding = 1),      
         )
         
     def forward(self, inputs):

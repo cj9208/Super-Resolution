@@ -22,7 +22,6 @@ class Adversarial_D(nn.Module):
             nn.LeakyReLU(negative_slope=0.2),
             
             nn.Conv2d(64,1,kernel_size),
-            nn.Sigmoid(),
         )
 
 
