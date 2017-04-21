@@ -210,6 +210,8 @@ if opt.mode == 'MSE':
     G.eval()
     for batch_index, (inputs, targets) in enumerate(loader):
         if batch_index == 0:
+            if use_cuda:
+                inputs, targets = inputs.cuda(), targets.cuda()
             inputs, targets = Variable(inputs), Variable(targets)
             G_outputs = G(inputs)
             
@@ -346,6 +348,8 @@ if opt.mode == 'visual':
     G.eval()
     for batch_index, (inputs, targets) in enumerate(loader):
         if batch_index == 0:
+            if use_cuda:
+                inputs, targets = inputs.cuda(), targets.cuda()
             inputs, targets = Variable(inputs), Variable(targets)
             G_outputs = G(inputs)
             
