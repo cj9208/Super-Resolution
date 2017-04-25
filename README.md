@@ -8,6 +8,8 @@ There are four modes :
 * WGAN
 * visual (plot the generated HR images given trained model)
 
+See images folder for examples of generated images.
+
 To be done :
 * full-sized networks
 * VGG loss
