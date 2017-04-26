@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 '''
 The generator network : 
@@ -14,17 +15,17 @@ class Adversarial_G(nn.Module):
         super(Adversarial_G, self).__init__()
 
         self.main = nn.Sequential(
-            nn.Conv2d(1,32,3,padding = 1),
+            nn.Conv2d(1,32,3,padding=1),
             nn.BatchNorm2d(32),
             nn.ReLU(),
             
-            nn.Conv2d(32,32,3,padding = 1),
+            nn.Conv2d(32,32,3,padding=1),
             nn.BatchNorm2d(32),
             nn.ReLU(),
             
-            nn.Conv2d(32,4,3,padding = 1),      
+            nn.Conv2d(32,4,3,padding=1),      
         )
         
     def forward(self, inputs):
         outputs = self.main(inputs)
-        return nn.functional.pixel_shuffle(outputs, upscale_factor = 2)
+        return F.pixel_shuffle(outputs, upscale_factor=2)
