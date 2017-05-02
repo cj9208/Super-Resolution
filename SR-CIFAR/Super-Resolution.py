@@ -238,7 +238,7 @@ if opt.mode == 'MSE':
 if opt.mode == 'WGAN':
     print('I love GAN\n')
     
-    input_size = 28
+    input_size = 32
     # networks
     G = Adversarial_G()
     D = Adversarial_D(input_size = input_size, wgan = True)
@@ -301,6 +301,7 @@ if opt.mode == 'WGAN':
                     origin_img = origin_img.cuda()
                     small_img = small_img.cuda()
                 
+                # train with real
                 inputv = Variable(origin_img)
                 errD_real = D(inputv)
                 errD_real.backward(one)
@@ -322,8 +323,12 @@ if opt.mode == 'WGAN':
             
             data = data_iter.next()
             i += 1 
+
                 
             small_img, origin_img = data
+            if small_img.size(0) != opt.batch_size:
+                continue 
+
             if use_cuda:
                 origin_img = origin_img.cuda()
                 small_img = small_img.cuda()
@@ -365,7 +370,7 @@ if opt.mode == 'WGAN':
 elif opt.mode == 'GAN':
     print('I love GAN\n')
     
-    input_size = 28
+    input_size = 32
     # networks
     G = Adversarial_G()
     D = Adversarial_D(input_size = input_size, wgan=False)
@@ -559,34 +564,12 @@ if opt.mode == 'visual':
 
             # LR / MSE / GAN / WGAN / original 
             # four images 
-            images_ori = targets.data
-            images_MSE = outputs_MSE.data
-            images_GAN = outputs_GAN.data
-            images_WGAN = outputs_WGAN.data
-
-            fig = plt.figure()
-            for i in range(4):
-                a = fig.add_subplot(4,4,4*i+1)
-                img = images_ori[i]
-                myimshow(img)
-                plt.text(1,1, 'origin')
+            torchvision.utils.save_image(targets.data, 'origin_samples_origin.png')
+            torchvision.utils.save_image(outputs_MSE.data, 'origin_samples_MSE.png')
+            torchvision.utils.save_image(outputs_GAN.data, 'origin_samples_GAN.png')
+            torchvision.utils.save_image(outputs_WGAN.data, 'origin_samples_WGAN.png')
 
 
-                a = fig.add_subplot(4,4,4*i+2)
-                img = images_MSE[i]
-                myimshow(img)
-                plt.text(1,1, 'MSE')
-
-                a = fig.add_subplot(4,4,4*i+3)
-                img = images_GAN[i]
-                myimshow(img)
-                plt.text(1,1, 'GAN')
-
-                a = fig.add_subplot(4,4,4*i+4)
-                img = images_WGAN[i]
-                myimshow(img)
-                plt.text(1,1, 'WGAN')
-            fig.savefig('compare.png')
 
 
 
