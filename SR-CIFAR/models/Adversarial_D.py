@@ -11,7 +11,7 @@ The discriminator network:
 class Adversarial_D(nn.Module):
     def __init__(self, input_size, wgan = False):
         super(Adversarial_D, self).__init__()
-        
+        self.wgan = wgan
         kernel_size = int(input_size / 4) #otherwise it would give float  
         
         self.main = nn.Sequential(
@@ -23,11 +23,12 @@ class Adversarial_D(nn.Module):
             
             nn.Conv2d(64,1,kernel_size),
         )
-        if wgan == False:
-            self.mani += [nn.Sigmoid()]
-
 
     def forward(self, inputs):
         outputs = self.main(inputs)
-        return outputs.view(-1)
+        outputs = outputs.view(-1)
+        if self.wgan == False:
+            s = nn.Sigmoid()
+            outputs = s(outputs)
+        return outputs
     
