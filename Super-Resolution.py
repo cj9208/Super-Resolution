@@ -10,6 +10,7 @@ from torchvision import datasets, transforms
 import os
 import shutil
 import argparse
+
 import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
@@ -352,11 +353,11 @@ if opt.mode == 'WGAN':
     torch.save({'epoch': epoch + 1,
                 'state_dict': G.state_dict(),
                 'best_prec1': 0,
-               }, 'checkpoint/G_GAN.pth.tar' )
+               }, 'checkpoint/G_WGAN.pth.tar' )
     torch.save({'epoch': epoch + 1,
                 'state_dict': D.state_dict(),
                 'best_prec1': 0,
-               }, 'checkpoint/D_GAN.pth.tar' )
+               }, 'checkpoint/D_WGAN.pth.tar' )
     
     print('Save the ouputs : ')
     G.eval()
@@ -490,6 +491,14 @@ elif opt.mode == 'GAN':
 
             optimizerG.step()
 
+    torch.save({'epoch': epoch + 1,
+                'state_dict': G.state_dict(),
+                'best_prec1': 0,
+               }, 'checkpoint/G_GAN.pth.tar' )
+    torch.save({'epoch': epoch + 1,
+                'state_dict': D.state_dict(),
+                'best_prec1': 0,
+               }, 'checkpoint/D_GAN.pth.tar' )
 
 
     print('Save the ouputs : ')
@@ -507,30 +516,61 @@ elif opt.mode == 'GAN':
        
 
 if opt.mode == 'visual':
-    G = Adversarial_G()
+
+    G_MSE = Adversarial_G()
+    G_GAN = Adversarial_G()
+    G_WGAN = Adversarial_G()
+
     if opt.resume:
-        if os.path.isfile('checkpoint/'+ opt.G):
-            print("==> loading checkpoint {}".format(opt.G))
-            checkpoint = torch.load('checkpoint/'+ opt.G)
-            start_epoch = checkpoint['epoch']
-            best_prec1 = checkpoint['best_prec1']
-            G.load_state_dict(checkpoint['state_dict'])
-            print('==> {} has been loaded'.format(opt.G))
+        if os.path.isfile('checkpoint/'+ 'G_best.pth.tar'):
+            print("==> loading checkpoint {}".format('G_best.pth.tar'))
+            checkpoint = torch.load('checkpoint/'+ 'G_best.pth.tar')
+            G_MSE.load_state_dict(checkpoint['state_dict'])
+            print('==> {} has been loaded'.format('G_best.pth.tar'))
         else:
-            print("=> no checkpoint found")
+            print("=> no checkpoint for MSE found")
+
+        if os.path.isfile('checkpoint/'+ 'G_GAN.pth.tar'):
+            print("==> loading checkpoint {}".format('G_GAN.pth.tar'))
+            checkpoint = torch.load('checkpoint/'+ 'G_GAN.pth.tar')
+            G_GAN.load_state_dict(checkpoint['state_dict'])
+            print('==> {} has been loaded'.format('G_GAN.pth.tar'))
+        else:
+            print("=> no checkpoint for GAN found")
+
+        if os.path.isfile('checkpoint/'+ 'G_WGAN.pth.tar'):
+            print("==> loading checkpoint {}".format('G_WGAN.pth.tar'))
+            checkpoint = torch.load('checkpoint/'+ 'G_WGAN.pth.tar')
+            G_WGAN.load_state_dict(checkpoint['state_dict'])
+            print('==> {} has been loaded'.format('G_WGAN.pth.tar'))
+        else:
+            print("=> no checkpoint for WGAN found")    
         print('\n')
         
-    G.eval()
+    G_MSE.eval()
+    G_GAN.eval()
+    G_WGAN.eval()
+    if use_cuda:
+        G_MSE.cuda()
+        G_GAN.cuda()
+        G_WGAN.cuda()
+
+    # for plot, plot 8 images together
+    loader = torch.utils.data.DataLoader(mnist,batch_size=8, shuffle=True)
     for batch_index, (inputs, targets) in enumerate(loader):
         if batch_index == 0:
             if use_cuda:
                 inputs, targets = inputs.cuda(), targets.cuda()
             inputs, targets = Variable(inputs), Variable(targets)
-            G_outputs = G(inputs)
-            
-            torchvision.utils.save_image(inputs.data, 'inputs_samples_{}_{}_{}_{}_{}.png'.format(opt.mode, opt.niter, opt.lrD, opt.lrG, opt.ratio))
-            torchvision.utils.save_image(G_outputs.data, 'outputs_samples_{}_{}_{}_{}_{}.png'.format(opt.mode, opt.niter, opt.lrD, opt.lrG, opt.ratio))
-            torchvision.utils.save_image(targets.data, 'origin_samples_{}_{}_{}_{}_{}.png'.format(opt.mode, opt.niter,opt.lrD, opt.lrG, opt.ratio))
+            outputs_MSE = G_MSE(inputs)
+            outputs_GAN = G_GAN(inputs)
+            outputs_WGAN = G_WGAN(inputs)
 
 
-        
+            # LR / MSE / GAN / WGAN / original 
+            # four images 
+
+            torchvision.utils.save_image(targets.data, 'origin_samples_origin.png')
+            torchvision.utils.save_image(outputs_MSE.data, 'origin_samples_MSE.png')
+            torchvision.utils.save_image(outputs_GAN.data, 'origin_samples_GAN.png')
+            torchvision.utils.save_image(outputs_WGAN.data, 'origin_samples_WGAN.png')
