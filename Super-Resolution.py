@@ -18,7 +18,8 @@ import matplotlib.pyplot as plt
 import time
 
 # for my models
-from models import *
+from models import Adversarial_G
+from models import Adversarial_D
 
 # for dataset
 # given a batch of images, can I scale them all ? 
@@ -246,7 +247,7 @@ if opt.mode == 'MSE':
             torchvision.utils.save_image(targets.data, 'origin_samples_{}_{}_{}_{}_{}.png'.format(opt.mode, opt.niter,opt.lrD, opt.lrG, opt.ratio))
 
 if opt.mode == 'WGAN':
-    print('I love GAN\n')
+    print("I love GAN\n")
     
     input_size = 28
     # networks
@@ -294,15 +295,15 @@ if opt.mode == 'WGAN':
             else :
                 Diters = opt.Diters
                 
-            j=0
+            j = 0
             while j < Diters and i < len(loader) - 1:
-                j+=1
+                j += 1
                 
                 for p in D.parameters():
                     p.data.clamp_(-0.01, 0.01)
                     
                 data = data_iter.next()
-                i+=1
+                i += 1
                 
                 # train with real
                 D.zero_grad()        
@@ -373,7 +374,7 @@ if opt.mode == 'WGAN':
             torchvision.utils.save_image(targets.data, 'origin_samples_{}_{}_{}_{}_{}.png'.format(opt.mode, opt.niter,opt.lrD, opt.lrG, opt.ratio))
        
 elif opt.mode == 'GAN':
-    print('I love GAN\n')
+    print("I love GAN\n")
     
     input_size = 28
     # networks
